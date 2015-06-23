@@ -15,16 +15,20 @@ original_TECHNICAL_500_TEMPLATE = debug.TECHNICAL_500_TEMPLATE
 original_technical_500_response = debug.technical_500_response
 
 FIX_MY_DJANGO_MESSAGE = """
-    Fix My Django may have a solution for this exception! Check:
-    <a href="{url}" target="_blank">{url}</a>
+    <h2 style="color: #44B78B;">
+        Fix My Django may have a solution for this exception! Check:
+        <a href="{url}" target="_blank">{url}</a>
+    </h2>
 """
 FIX_MY_DJANGO_MESSAGE_PLAIN = """
     Fix My Django may have a solution for this exception! Check: {url}
 """.strip()
 FIX_MY_DJANGO_MESSAGE_TO_ADMIN = """
-    Hey admin, Fix My Django doesn't have this error yet! Go add it in
-    <a href="http://www.fixmydjango.com/admin/error_posts/errorpost/add/" target="_blank">
-    http://www.fixmydjango.com/admin/error_posts/errorpost/add/</a>
+    <h2 style="color: #FF0000;">
+        Hey admin, Fix My Django doesn't have this error yet! Go add it in
+        <a href="http://www.fixmydjango.com/admin/error_posts/errorpost/add/" target="_blank">
+        http://www.fixmydjango.com/admin/error_posts/errorpost/add/</a>
+    </h2>
 """
 FIX_MY_DJANGO_MESSAGE_TO_ADMIN_PLAIN = """
     Fix My Django may have a solution for this exception! Check:
@@ -69,7 +73,7 @@ class ExceptionReporterPatch(original_ExceptionReporter):
 def patch_technical_500_template():
     t = original_TECHNICAL_500_TEMPLATE
     index = t.index('</pre>') + len('</pre>')
-    insertion = '<h2 style="color: #44B78B;">{{ fix_my_django_message|safe }}</h2>'
+    insertion = '{{ fix_my_django_message|safe }}'
 
     return t[:index] + insertion + t[index:]
 
