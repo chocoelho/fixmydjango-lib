@@ -1,3 +1,5 @@
+__version__ = '0.0.1'
+
 import traceback
 
 from django.views import debug
