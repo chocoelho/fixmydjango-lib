@@ -1,4 +1,4 @@
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 
 import traceback
 
@@ -6,7 +6,7 @@ from django.views import debug
 
 from termcolor import colored
 
-from core.sanitize_tb import is_django_exception
+from .sanitize_tb import is_django_exception
 
 
 original_ExceptionReporter = debug.ExceptionReporter
@@ -15,10 +15,10 @@ original_technical_500_response = debug.technical_500_response
 
 FIX_MY_DJANGO_MESSAGE = """
     Fix My Django may have a solution for this exception! Check:
-    <a href="http://fixmydjango.com" target="_blank">http://fixmydjango.com</a>
+    <a href="{url}" target="_blank">{url}</a>
 """
 FIX_MY_DJANGO_MESSAGE_PLAIN = """
-    Fix My Django may have a solution for this exception! Check: http://fixmydjango.com
+    Fix My Django may have a solution for this exception! Check: {url}
 """.strip()
 
 
@@ -29,7 +29,8 @@ class ExceptionReporterPatch(original_ExceptionReporter):
         tb_lines = traceback.format_exception(self.exc_type, self.exc_value, self.tb)
 
         if is_django_exception(tb_lines):
-            c['fix_my_django_message'] = FIX_MY_DJANGO_MESSAGE
+            c['fix_my_django_message'] = FIX_MY_DJANGO_MESSAGE.format(
+                url='http://fixmydjango.com')
         return c
 
 
@@ -50,7 +51,9 @@ def technical_500_response_patch(request, exc_type, exc_value, tb, status_code=5
     """
     tb_lines = traceback.format_exception(exc_type, exc_value, tb)
     if is_django_exception(tb_lines):
-        print colored(FIX_MY_DJANGO_MESSAGE_PLAIN, 'yellow')
+        message = FIX_MY_DJANGO_MESSAGE_PLAIN.format(
+            url='http://fixmydjango.com')
+        print colored(message, 'yellow')
 
     return original_technical_500_response(request, exc_type, exc_value, tb, status_code)
 
