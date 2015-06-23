@@ -16,6 +16,9 @@ author_email = 'flavio@vinta.com.br'
 license = 'MIT'
 install_requires = [
     'Django >= 1.8.2',
+    'requests >= 2.7.0',
+    'boltons >= 0.6.4',
+    'termcolor >= 1.1.0',
 ]
 
 

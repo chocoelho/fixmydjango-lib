@@ -86,3 +86,14 @@ def sanitize_traceback(clean_tb):
         tb_sanitized_splitted.append(tb_line)
 
     return '\n'.join(tb_sanitized_splitted)
+
+
+def extract_traceback_info(tb):
+    parsed_traceback = ParsedException.from_string(tb).to_dict()
+    last_frame = parsed_traceback['frames'][-1]
+
+    return {
+        'parsed_traceback': parsed_traceback,
+        'raised_by': last_frame['filepath'],
+        'raised_by_line': int(last_frame['lineno'])
+    }
