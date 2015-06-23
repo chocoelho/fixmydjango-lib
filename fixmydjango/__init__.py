@@ -1,4 +1,4 @@
-__version__ = '0.0.3'
+__version__ = '0.0.4'
 
 import traceback
 
@@ -49,7 +49,7 @@ class ExceptionReporterPatch(original_ExceptionReporter):
                 tb_info = extract_traceback_info(sanitized_tb)
 
                 response = search_exceptions(
-                    exception_type=str(self.exc_type),
+                    exception_type=tb_info['parsed_traceback']['exc_type'],
                     raised_by=tb_info['raised_by'])
 
                 if len(response):

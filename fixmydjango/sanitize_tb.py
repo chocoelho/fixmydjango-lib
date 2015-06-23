@@ -91,9 +91,10 @@ def sanitize_traceback(clean_tb):
 def extract_traceback_info(tb):
     parsed_traceback = ParsedException.from_string(tb).to_dict()
     last_frame = parsed_traceback['frames'][-1]
+    last_frame_filepath = last_frame['filepath']
 
     return {
         'parsed_traceback': parsed_traceback,
-        'raised_by': last_frame['filepath'],
+        'raised_by': last_frame_filepath[last_frame_filepath.index('django/'):],
         'raised_by_line': int(last_frame['lineno'])
     }
