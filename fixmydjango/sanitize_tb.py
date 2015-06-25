@@ -51,7 +51,7 @@ def sanitize_traceback(clean_tb):
     file_re = re.compile(
         r'File \".+\",')
     deps_file_re = re.compile(
-        r'File \".+((?:python.+)+?.+site-packages.+)\",')
+        r'File \".*((?:python.+)+?.+site-packages.+)\",')
     line_number_re = re.compile(
         r'line \d+, in .+')
     prev_line_was_pvt_file = False
