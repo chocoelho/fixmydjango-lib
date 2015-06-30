@@ -78,6 +78,7 @@ class ExceptionReporterPatch(original_ExceptionReporter):
                 print(colored(plain_message, 'yellow'))
         except Exception:
             # TODO: allow user to report bug
+            # print(traceback.format_exc())
             print(colored("oops, Fix My Django got an unexpected exception", 'red'))
 
         return c

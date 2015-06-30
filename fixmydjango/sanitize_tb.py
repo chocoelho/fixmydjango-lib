@@ -3,7 +3,7 @@ import re
 from boltons.tbutils import ParsedException
 
 
-_exception_re = re.compile(r'.+: .*')
+_exception_re = re.compile(r'^([^\d\W]\w*)+(: .*)?$')
 
 
 def is_django_exception(tb_lines):
