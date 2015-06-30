@@ -16,7 +16,7 @@ author = 'Flávio Juvenal da Silva Junior'
 author_email = 'flavio@vinta.com.br'
 license = 'MIT'
 install_requires = [
-    'Django >= 1.6',
+    'Django >= 1.4',
     'requests == 2.7.0',
     'boltons == 0.6.4',
     'termcolor == 1.1.0',
@@ -77,5 +77,5 @@ setup(
     packages=get_packages(package),
     package_data=get_package_data(package),
     install_requires=install_requires,
-    #test_suite='tox'
+    test_suite='tox'
 )
