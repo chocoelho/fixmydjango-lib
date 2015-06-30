@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 from setuptools import setup
 import re
 import os
@@ -15,10 +16,10 @@ author = 'Flávio Juvenal da Silva Junior'
 author_email = 'flavio@vinta.com.br'
 license = 'MIT'
 install_requires = [
-    'Django >= 1.8.2',
-    'requests >= 2.7.0',
-    'boltons >= 0.6.4',
-    'termcolor >= 1.1.0',
+    'Django >= 1.6',
+    'requests == 2.7.0',
+    'boltons == 0.6.4',
+    'termcolor == 1.1.0',
 ]
 
 
@@ -59,9 +60,9 @@ def get_package_data(package):
 if sys.argv[-1] == 'publish':
     os.system("python setup.py sdist upload")
     args = {'version': get_version(package)}
-    print "You probably want to also tag the version now:"
-    print "  git tag -a %(version)s -m 'version %(version)s'" % args
-    print "  git push --tags"
+    print("You probably want to also tag the version now:")
+    print("  git tag -a %(version)s -m 'version %(version)s'" % args)
+    print("  git push --tags")
     sys.exit()
 
 

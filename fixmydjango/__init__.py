@@ -1,4 +1,4 @@
-__version__ = '0.0.4'
+from __future__ import print_function, unicode_literals
 
 import traceback
 
@@ -11,6 +11,8 @@ from termcolor import colored
 from .sanitize_tb import is_django_exception, extract_traceback_info, clean_traceback, sanitize_traceback
 from .client import search_exceptions
 
+
+__version__ = '0.0.4'
 
 original_ExceptionReporter = debug.ExceptionReporter
 original_TECHNICAL_500_TEMPLATE = debug.TECHNICAL_500_TEMPLATE
@@ -73,10 +75,10 @@ class ExceptionReporterPatch(original_ExceptionReporter):
                         admin_url=admin_url)
 
                 c['fix_my_django_message'] = message
-                print colored(plain_message, 'yellow')
+                print(colored(plain_message, 'yellow'))
         except Exception:
             # TODO: allow user to report bug
-            print colored("oops, Fix My Django got an unexpected exception", 'red')
+            print(colored("oops, Fix My Django got an unexpected exception", 'red'))
 
         return c
 

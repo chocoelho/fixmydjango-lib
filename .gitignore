@@ -9,3 +9,5 @@
 /coverage_html/
 /staticfiles/
 /media/
+/.tox/
+/*.egg-info/
