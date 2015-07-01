@@ -82,11 +82,29 @@ def test_clean_traceback_first_line():
 
 
 def test_clean_traceback_last_line_with_message():
-    tb = django_tb.replace('TemplateDoesNotExist:', '')
+    tb = django_tb.replace('TemplateDoesNotExist: none.html', '123456')
 
     with pytest.raises(ValueError) as ex:
         clean_traceback(tb)
     assert 'Malformed traceback: last line must be' in str(ex)
+
+
+def test_clean_traceback_file_lines():
+    tb = django_tb.replace(
+        'line 139, in get_response',
+        'garbage garbage')
+
+    with pytest.raises(ValueError) as ex:
+        clean_traceback(tb)
+    assert 'Malformed traceback: line 2 (1-indexed)' in str(ex)
+
+    tb = django_tb.replace(
+        'File "python2.7/site-packages/django/template/response.py"',
+        'garbage garbage')
+
+    with pytest.raises(ValueError) as ex:
+        clean_traceback(tb)
+    assert 'Malformed traceback: line 4 (1-indexed)' in str(ex)
 
 
 def test_sanitize_traceback():

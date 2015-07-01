@@ -2,8 +2,9 @@ import re
 
 from boltons.tbutils import ParsedException
 
-
-_exception_re = re.compile(r'^([^\d\W]\w*)+(: .*)?$')
+_exception_re = re.compile(r'^([^\d\W][\w\.]*)+(: .*)?$')
+_file_line_re_text = r'^File \".+\", line \d+, in .+$'
+_file_line_re = re.compile(_file_line_re_text)
 
 
 def is_django_exception(tb_lines):
@@ -21,10 +22,6 @@ def clean_traceback(tb):
                 if line.strip()]
 
     # check conditions
-    if not is_django_exception(tb_lines):
-        raise ValueError(
-            "Invalid traceback: exception not thrown by Django")
-
     first_line = tb_lines[0]
     first_line_should_be = 'Traceback (most recent call last):'
     if first_line != first_line_should_be:
@@ -39,6 +36,19 @@ def clean_traceback(tb):
         raise ValueError(
             "Malformed traceback: last line must be "
             "exception type and message")
+
+    file_lines = tb_lines[1:-1:2]
+
+    for i, line in enumerate(file_lines):
+        if not _file_line_re.match(line.strip()):
+            raise ValueError(
+                "Malformed traceback: line {} (1-indexed) "
+                "doesn't matches regex {}".format(i * 2 + 2,
+                                                  _file_line_re_text))
+
+    if not is_django_exception(tb_lines):
+        raise ValueError(
+            "Invalid traceback: exception not thrown by Django")
 
     # try to parse
     tb = '\n'.join(tb_lines)
