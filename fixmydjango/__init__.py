@@ -12,7 +12,7 @@ from .sanitize_tb import is_django_exception, extract_traceback_info, clean_trac
 from .client import search_exceptions
 
 
-__version__ = '0.0.4'
+__version__ = '0.0.5'
 
 original_ExceptionReporter = debug.ExceptionReporter
 original_TECHNICAL_500_TEMPLATE = debug.TECHNICAL_500_TEMPLATE
