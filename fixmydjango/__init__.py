@@ -8,11 +8,13 @@ from django.utils.http import urlencode
 
 from termcolor import colored
 
-from .sanitize_tb import is_django_exception, extract_traceback_info, clean_traceback, sanitize_traceback
+from .sanitize_tb import (
+    is_django_exception, split_and_strip_tb_lines, extract_traceback_info,
+    clean_traceback, sanitize_traceback)
 from .client import search_exceptions
 
 
-__version__ = '0.0.5'
+__version__ = '0.0.6'
 
 original_ExceptionReporter = debug.ExceptionReporter
 original_TECHNICAL_500_TEMPLATE = debug.TECHNICAL_500_TEMPLATE
@@ -47,9 +49,10 @@ class ExceptionReporterPatch(original_ExceptionReporter):
 
         try:
             tb_lines = traceback.format_exception(self.exc_type, self.exc_value, self.tb)
+            tb = '\n'.join(tb_lines)
 
-            if is_django_exception(tb_lines):
-                sanitized_tb = sanitize_traceback(clean_traceback('\n'.join(tb_lines)))
+            if is_django_exception(split_and_strip_tb_lines(tb)):
+                sanitized_tb = sanitize_traceback(clean_traceback(tb))
                 tb_info = extract_traceback_info(sanitized_tb)
 
                 response = search_exceptions(

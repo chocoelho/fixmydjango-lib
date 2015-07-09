@@ -7,19 +7,25 @@ _file_line_re_text = r'^File \".+\", line \d+, in .+$'
 _file_line_re = re.compile(_file_line_re_text)
 
 
-def is_django_exception(tb_lines):
-    last_file_line = tb_lines[-3]
-    django_index = last_file_line.find('/django')
-    return django_index != -1
-
-
-def clean_traceback(tb):
+def split_and_strip_tb_lines(tb):
     # remove \r
     tb = tb.replace('\r', '')
 
     # remove empty lines
     tb_lines = [line for line in tb.split('\n')
                 if line.strip()]
+
+    return tb_lines
+
+
+def is_django_exception(tb_lines):
+    last_file_line = tb_lines[-3]
+    django_index = last_file_line.find('/django/')
+    return django_index != -1
+
+
+def clean_traceback(tb):
+    tb_lines = split_and_strip_tb_lines(tb)
 
     # check conditions
     first_line = tb_lines[0]

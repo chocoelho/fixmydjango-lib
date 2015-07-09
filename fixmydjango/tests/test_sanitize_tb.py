@@ -46,6 +46,11 @@ def get_tb_lines_of_regular_ex():
 def test_is_django_exception():
     assert is_django_exception(django_tb.split('\n'))
     assert not is_django_exception(get_tb_lines_of_regular_ex())
+    assert not is_django_exception(
+        django_tb.replace(
+            '/django/template/loader.py',
+            '/django-filter/template/loader.py').
+        split('\n'))
 
 
 def test_clean_traceback():
