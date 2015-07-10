@@ -15,7 +15,7 @@ from .sanitize_tb import (
 from .client import search_exceptions
 
 
-__version__ = '0.0.7'
+__version__ = '0.0.8'
 
 original_ExceptionReporter = debug.ExceptionReporter
 original_TECHNICAL_500_TEMPLATE = debug.TECHNICAL_500_TEMPLATE
@@ -68,7 +68,8 @@ class ExceptionReporterPatch(original_ExceptionReporter):
 
                 response = search_exceptions(
                     exception_type=tb_info['parsed_traceback']['exc_type'],
-                    raised_by=tb_info['raised_by'])
+                    raised_by=tb_info['raised_by'],
+                    raised_by_line=tb_info['parsed_traceback']['frames'][-1]['lineno'])
 
                 if response['error_post_list']:
                     url = response['list_url']
