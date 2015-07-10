@@ -28,7 +28,7 @@ FIX_MY_DJANGO_MESSAGE = """
         <a href="{{ url }}" target="_blank">{{ url }}</a>
     </h2>
     {% if is_admin_mode %}
-        <h3>
+        <h3 style="color: #FF0000;">
             You can add this exception as a new error by
             <a href="{{ admin_url }}" target="_blank">clicking here</a>
         </h3>
