@@ -6,6 +6,7 @@ import django
 from django.views import debug
 from django.utils.http import urlencode
 from django.conf import settings
+from django.template import Template, Context
 
 from termcolor import colored
 
@@ -15,7 +16,7 @@ from .sanitize_tb import (
 from .client import search_exceptions
 
 
-__version__ = '0.0.8'
+__version__ = '0.0.9'
 
 original_ExceptionReporter = debug.ExceptionReporter
 original_TECHNICAL_500_TEMPLATE = debug.TECHNICAL_500_TEMPLATE
@@ -24,8 +25,14 @@ original_technical_500_response = debug.technical_500_response
 FIX_MY_DJANGO_MESSAGE = """
     <h2 style="color: #44B78B;">
         Fix My Django may have a solution for this exception! Check:
-        <a href="{url}" target="_blank">{url}</a>
+        <a href="{{ url }}" target="_blank">{{ url }}</a>
     </h2>
+    {% if is_admin_mode %}
+        <h3>
+            You can add this exception as a new error by
+            <a href="{{ admin_url }}" target="_blank">clicking here</a>
+        </h3>
+    {% endif %}
 """
 FIX_MY_DJANGO_MESSAGE_PLAIN = """
     Fix My Django may have a solution for this exception! Check: {url}
@@ -33,8 +40,7 @@ FIX_MY_DJANGO_MESSAGE_PLAIN = """
 FIX_MY_DJANGO_MESSAGE_TO_ADMIN = """
     <h2 style="color: #FF0000;">
         Hey admin, Fix My Django doesn't have this error yet! Add it by
-        <a href="{admin_url}" target="_blank">
-        clicking here</a>
+        <a href="{admin_url}" target="_blank">clicking here</a>
     </h2>
 """
 FIX_MY_DJANGO_MESSAGE_TO_ADMIN_PLAIN = """
@@ -65,6 +71,10 @@ class ExceptionReporterPatch(original_ExceptionReporter):
             if is_django_exception(split_and_strip_tb_lines(tb)):
                 sanitized_tb = sanitize_traceback(clean_traceback(tb))
                 tb_info = extract_traceback_info(sanitized_tb)
+                is_admin_mode = getattr(settings, 'FIX_MY_DJANGO_ADMIN_MODE', False)
+                admin_url = self._get_fix_my_django_admin_url(
+                    tb_info=tb_info,
+                    sanitized_tb=sanitized_tb)
 
                 response = search_exceptions(
                     exception_type=tb_info['parsed_traceback']['exc_type'],
@@ -73,12 +83,16 @@ class ExceptionReporterPatch(original_ExceptionReporter):
 
                 if response['error_post_list']:
                     url = response['list_url']
-                    message = FIX_MY_DJANGO_MESSAGE.format(url=url)
+                    message = (
+                        Template(FIX_MY_DJANGO_MESSAGE).
+                        render(Context({
+                            'url': url,
+                            'is_admin_mode': is_admin_mode,
+                            'admin_url': admin_url
+                        })))
+
                     plain_message = FIX_MY_DJANGO_MESSAGE_PLAIN.format(url=url)
-                elif getattr(settings, 'FIX_MY_DJANGO_ADMIN_MODE', False):
-                    admin_url = self._get_fix_my_django_admin_url(
-                        tb_info=tb_info,
-                        sanitized_tb=sanitized_tb)
+                elif is_admin_mode:
                     message = FIX_MY_DJANGO_MESSAGE_TO_ADMIN.format(
                         admin_url=admin_url)
                     plain_message = FIX_MY_DJANGO_MESSAGE_TO_ADMIN_PLAIN.format(

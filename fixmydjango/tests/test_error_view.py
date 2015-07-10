@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse
 from termcolor import colored
 
 from fixmydjango import FIX_MY_DJANGO_MESSAGE, FIX_MY_DJANGO_MESSAGE_PLAIN
+from fixmydjango.tests.utils import format_template
 from django.conf import settings as testsettings
 
 
@@ -34,7 +35,7 @@ def test_error_view(settings, api_live_server, live_server, capsys):
         response = requests.get(live_server.url + reverse('test-error'))
 
         assert response.status_code == 500
-        assert FIX_MY_DJANGO_MESSAGE.format(url=test_data_url).encode('utf-8') in response.content
+        assert format_template(FIX_MY_DJANGO_MESSAGE, {'url': test_data_url}) in response.content
 
         out, err = capsys.readouterr()
         assert out == colored(FIX_MY_DJANGO_MESSAGE_PLAIN.format(url=test_data_url), 'yellow') + '\n'
