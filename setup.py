@@ -8,10 +8,10 @@ import os
 import sys
 
 
-name = 'fix-my-django-lib'
+name = 'fixmydjango'
 package = 'fixmydjango'
 description = 'A Django app for finding solutions to exceptions'
-url = 'http://github.com/vintasoftware/fix-my-django-lib'
+url = 'http://github.com/vintasoftware/fixmydjango-lib'
 author = 'Flávio Juvenal da Silva Junior'
 author_email = 'flavio@vinta.com.br'
 license = 'MIT'
