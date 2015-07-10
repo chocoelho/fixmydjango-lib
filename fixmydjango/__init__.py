@@ -5,6 +5,7 @@ import traceback
 import django
 from django.views import debug
 from django.utils.http import urlencode
+from django.conf import settings
 
 from termcolor import colored
 
@@ -14,7 +15,7 @@ from .sanitize_tb import (
 from .client import search_exceptions
 
 
-__version__ = '0.0.6'
+__version__ = '0.0.7'
 
 original_ExceptionReporter = debug.ExceptionReporter
 original_TECHNICAL_500_TEMPLATE = debug.TECHNICAL_500_TEMPLATE
@@ -44,6 +45,16 @@ FIX_MY_DJANGO_MESSAGE_TO_ADMIN_PLAIN = """
 
 class ExceptionReporterPatch(original_ExceptionReporter):
 
+    def _get_fix_my_django_admin_url(self, tb_info, sanitized_tb):
+        return '{url}?{query}'.format(
+            url='http://www.fixmydjango.com/admin/error_posts/errorpost/add/',
+            query=urlencode({
+                'exception_type': tb_info['parsed_traceback']['exc_type'],
+                'error_message': tb_info['parsed_traceback']['exc_msg'],
+                'django_version': '{0[0]}.{0[1]}'.format(django.VERSION),
+                'traceback': sanitized_tb
+            }))
+
     def get_traceback_data(self):
         c = super(ExceptionReporterPatch, self).get_traceback_data()
 
@@ -59,26 +70,25 @@ class ExceptionReporterPatch(original_ExceptionReporter):
                     exception_type=tb_info['parsed_traceback']['exc_type'],
                     raised_by=tb_info['raised_by'])
 
-                if len(response):
-                    url = response[0]['url']
+                if response['error_post_list']:
+                    url = response['list_url']
                     message = FIX_MY_DJANGO_MESSAGE.format(url=url)
                     plain_message = FIX_MY_DJANGO_MESSAGE_PLAIN.format(url=url)
-                else:
-                    admin_url = '{url}?{query}'.format(
-                        url='http://www.fixmydjango.com/admin/error_posts/errorpost/add/',
-                        query=urlencode({
-                            'exception_type': tb_info['parsed_traceback']['exc_type'],
-                            'error_message': tb_info['parsed_traceback']['exc_msg'],
-                            'django_version': '{0[0]}.{0[1]}'.format(django.VERSION),
-                            'traceback': sanitized_tb
-                        }))
+                elif getattr(settings, 'FIX_MY_DJANGO_ADMIN_MODE', False):
+                    admin_url = self._get_fix_my_django_admin_url(
+                        tb_info=tb_info,
+                        sanitized_tb=sanitized_tb)
                     message = FIX_MY_DJANGO_MESSAGE_TO_ADMIN.format(
                         admin_url=admin_url)
                     plain_message = FIX_MY_DJANGO_MESSAGE_TO_ADMIN_PLAIN.format(
                         admin_url=admin_url)
+                else:
+                    message = None
+                    plain_message = None
 
-                c['fix_my_django_message'] = message
-                print(colored(plain_message, 'yellow'))
+                if message and plain_message:
+                    c['fix_my_django_message'] = message
+                    print(colored(plain_message, 'yellow'))
         except Exception:
             # TODO: allow user to report bug
             # print(traceback.format_exc())
