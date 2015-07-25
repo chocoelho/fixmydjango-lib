@@ -30,6 +30,9 @@ Fix My Django is a library for helping Django developers to find solutions for c
     ![Fix My Django example](https://s3.amazonaws.com/fixmydjango/screenshots/Screen+Shot+2015-07-25+at+19.36.50.png)
 
 
+## Privacy
+We only look for solutions to exceptions thown from inside Django source-code and we don't use exception message to search for similar ones. Take a look at [`client.py`](https://github.com/vintasoftware/fixmydjango-lib/blob/master/fixmydjango/client.py) to see how it's implemented. The API code is open-sourced at [https://github.com/vintasoftware/fixmydjango](https://github.com/vintasoftware/fixmydjango).
+
 ## Contribute
 Feel free to fork this project and contribute with it!
 
