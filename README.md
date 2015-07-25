@@ -6,7 +6,7 @@ Fix My Django is a library for helping Django developers to find solutions for c
 
     ```
     pip install fixmydjango
-    ``
+    ```
 
 2. Configure `settings.py` of your project by adding `'fixmydjango'` app
     
@@ -26,4 +26,12 @@ Fix My Django is a library for helping Django developers to find solutions for c
     ```
 
 3. Profit! If any known Django exception bite you, something like this will appear:
-![Fix My Django example](https://s3.amazonaws.com/fixmydjango/screenshots/Screen+Shot+2015-07-25+at+19.36.50.png)
+    
+    ![Fix My Django example](https://s3.amazonaws.com/fixmydjango/screenshots/Screen+Shot+2015-07-25+at+19.36.50.png)
+
+
+## Contribute
+Feel free to fork this project and contribute with it!
+
+## Authors
+Made by pythonistas at [Vinta Software Studio: vinta.com.br](http://www.vinta.com.br/?fixmydjango).
