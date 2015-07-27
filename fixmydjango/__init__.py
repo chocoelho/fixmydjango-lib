@@ -47,6 +47,7 @@ FIX_MY_DJANGO_MESSAGE_TO_ADMIN_PLAIN = """
     Hey admin, Fix My Django doesn't have this error yet! Add it on:
     {admin_url}
 """.strip()
+FIX_MY_DJANGO_OOPS_MESSAGE = "oops, Fix My Django got an unexpected exception"
 
 
 class ExceptionReporterPatch(original_ExceptionReporter):
@@ -63,6 +64,7 @@ class ExceptionReporterPatch(original_ExceptionReporter):
 
     def get_traceback_data(self):
         c = super(ExceptionReporterPatch, self).get_traceback_data()
+        is_admin_mode = getattr(settings, 'FIX_MY_DJANGO_ADMIN_MODE', False)
 
         try:
             tb_lines = traceback.format_exception(self.exc_type, self.exc_value, self.tb)
@@ -71,7 +73,6 @@ class ExceptionReporterPatch(original_ExceptionReporter):
             if is_django_exception(split_and_strip_tb_lines(tb)):
                 sanitized_tb = sanitize_traceback(clean_traceback(tb))
                 tb_info = extract_traceback_info(sanitized_tb)
-                is_admin_mode = getattr(settings, 'FIX_MY_DJANGO_ADMIN_MODE', False)
                 admin_url = self._get_fix_my_django_admin_url(
                     tb_info=tb_info,
                     sanitized_tb=sanitized_tb)
@@ -105,9 +106,9 @@ class ExceptionReporterPatch(original_ExceptionReporter):
                     c['fix_my_django_message'] = message
                     print(colored(plain_message, 'yellow'))
         except Exception:
-            # TODO: allow user to report bug
-            # print(traceback.format_exc())
-            print(colored("oops, Fix My Django got an unexpected exception", 'red'))
+            if is_admin_mode:
+                print(traceback.format_exc())
+            print(colored(FIX_MY_DJANGO_OOPS_MESSAGE, 'red'))
 
         return c
 
