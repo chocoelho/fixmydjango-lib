@@ -6,6 +6,7 @@ from setuptools import setup, find_packages
 import re
 import os
 import sys
+import codecs
 
 
 name = 'fixmydjango'
@@ -29,6 +30,11 @@ def get_version(package):
     """
     init_py = open(os.path.join(package, '__init__.py')).read()
     return re.search("^__version__ = ['\"]([^'\"]+)['\"]", init_py, re.MULTILINE).group(1)
+
+
+def get_long_description():
+    with codecs.open('README.rst', 'r', 'utf-8') as f:
+        return f.read()
 
 
 def get_package_data(package):
@@ -63,6 +69,7 @@ setup(
     url=url,
     license=license,
     description=description,
+    long_description=get_long_description(),
     author=author,
     author_email=author_email,
     packages=find_packages(exclude=['*.tests']),
