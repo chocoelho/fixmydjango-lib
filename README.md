@@ -1,4 +1,4 @@
-# fixmydjango-lib ![Travis CI](https://travis-ci.org/vintasoftware/fixmydjango-lib.svg?branch=master)
+# fixmydjango-lib [![Travis CI](https://travis-ci.org/vintasoftware/fixmydjango-lib.svg?branch=master)](https://travis-ci.org/vintasoftware/fixmydjango-lib.svg?branch=master) [![Coverage Status](https://coveralls.io/repos/vintasoftware/fixmydjango-lib/badge.svg?branch=master&service=github)](https://coveralls.io/github/vintasoftware/fixmydjango-lib?branch=master)
 Fix My Django is a library for helping Django developers to find solutions for common Django exceptions. While developing a Django project, if you get any exception in development server and [fixmydjango.com](http://www.fixmydjango.com) has a solution for it, this library will display a link to the solution in the error 500 debug template. Don't waste your time searching for exceptions on Google or Stack Overflow, just install this lib and be happy!
 
 ## How to use
