@@ -63,7 +63,7 @@ https://github.com/vintasoftware/fixmydjango.
 Contribute
 ----------
 
-Feel free to fork this project and contribute with it!
+Feel free to fork this project and contribute with it! GitHub repository at: https://github.com/vintasoftware/fixmydjango-lib
 
 Authors
 -------
