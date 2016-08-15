@@ -75,7 +75,7 @@ def test_technical_500_response_admin_mode(settings, mock_api_response, mocker, 
     assert response.status_code == 500
     assert format_template(
         FIX_MY_DJANGO_MESSAGE,
-        {'url': test_data_url, 'is_admin_mode': True, 'admin_url': admin_url}
+        {'url': test_data_url, 'admin_url': admin_url}
     ) in response.content
 
     out, err = capsys.readouterr()
@@ -85,7 +85,8 @@ def test_technical_500_response_admin_mode(settings, mock_api_response, mocker, 
 @pytest.mark.usefixtures('settings', 'mock_api_response_empty', 'mocker', 'rf', 'capsys')
 def test_technical_500_response_empty(settings, mock_api_response_empty, mocker, rf, capsys):
     settings.DEBUG = True
-    admin_url = 'http://www.fixmydjango.com/test-server/admin'
+    test_data_url = 'http://www.fixmydjango.com/test-server'
+    admin_url = 'http://www.fixmydjango.com/test-server/draft/create/'
 
     try:
         raise ValueError("test")
@@ -110,10 +111,9 @@ def test_technical_500_response_empty(settings, mock_api_response_empty, mocker,
     response = technical_500_response(request, *exc_info)
 
     assert response.status_code == 500
-    assert FIX_MY_DJANGO_MESSAGE_TO_ADMIN.format(admin_url=admin_url).encode('utf-8') not in response.content
 
     out, err = capsys.readouterr()
-    assert out == ''
+    assert out == colored(FIX_MY_DJANGO_MESSAGE_TO_ADMIN_PLAIN.format(admin_url=admin_url), 'yellow') + '\n'
 
 
 @pytest.mark.usefixtures('settings', 'mock_api_response_empty', 'mocker', 'rf', 'capsys')
