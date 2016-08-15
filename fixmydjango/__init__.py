@@ -39,12 +39,12 @@ FIX_MY_DJANGO_MESSAGE_PLAIN = """
 """.strip()
 FIX_MY_DJANGO_MESSAGE_TO_ADMIN = """
     <h2 style="color: #FF0000;">
-        Hey admin, Fix My Django doesn't have this error yet! Add it by
+        Hey, Fix My Django doesn't have this error yet! Add it by
         <a href="{admin_url}" target="_blank">clicking here</a>
     </h2>
 """
 FIX_MY_DJANGO_MESSAGE_TO_ADMIN_PLAIN = """
-    Hey admin, Fix My Django doesn't have this error yet! Add it on:
+    Hey, Fix My Django doesn't have this error yet! Add it on:
     {admin_url}
 """.strip()
 FIX_MY_DJANGO_OOPS_MESSAGE = "oops, Fix My Django got an unexpected exception"
@@ -53,8 +53,12 @@ FIX_MY_DJANGO_OOPS_MESSAGE = "oops, Fix My Django got an unexpected exception"
 class ExceptionReporterPatch(original_ExceptionReporter):
 
     def _get_fix_my_django_admin_url(self, tb_info, sanitized_tb):
+        """
+        Previously the hability to add error traces was limited to admins.
+        This is not case anymore as anyone can add it as a draft.
+        """
         return '{url}?{query}'.format(
-            url='http://www.fixmydjango.com/admin/error_posts/errorpost/add/',
+            url='http://www.fixmydjango.com/draft/create/',
             query=urlencode({
                 'exception_type': tb_info['parsed_traceback']['exc_type'],
                 'error_message': tb_info['parsed_traceback']['exc_msg'],
@@ -88,19 +92,15 @@ class ExceptionReporterPatch(original_ExceptionReporter):
                         Template(FIX_MY_DJANGO_MESSAGE).
                         render(Context({
                             'url': url,
-                            'is_admin_mode': is_admin_mode,
                             'admin_url': admin_url
                         })))
 
                     plain_message = FIX_MY_DJANGO_MESSAGE_PLAIN.format(url=url)
-                elif is_admin_mode:
+                else:
                     message = FIX_MY_DJANGO_MESSAGE_TO_ADMIN.format(
                         admin_url=admin_url)
                     plain_message = FIX_MY_DJANGO_MESSAGE_TO_ADMIN_PLAIN.format(
                         admin_url=admin_url)
-                else:
-                    message = None
-                    plain_message = None
 
                 if message and plain_message:
                     c['fix_my_django_message'] = message

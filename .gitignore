@@ -1,6 +1,7 @@
 *.pyc
 .DS_Store
 .sass-cache
+.cache/*
 *.sqlite3
 /.coverage
 /.env
