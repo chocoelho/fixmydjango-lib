@@ -102,9 +102,8 @@ class ExceptionReporterPatch(original_ExceptionReporter):
                     plain_message = FIX_MY_DJANGO_MESSAGE_TO_ADMIN_PLAIN.format(
                         admin_url=admin_url)
 
-                if message and plain_message:
-                    c['fix_my_django_message'] = message
-                    print(colored(plain_message, 'yellow'))
+                c['fix_my_django_message'] = message
+                print(colored(plain_message, 'yellow'))
         except Exception:
             if is_admin_mode:
                 print(traceback.format_exc())
