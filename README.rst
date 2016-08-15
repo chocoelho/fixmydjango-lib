@@ -65,6 +65,8 @@ Contribute
 
 Feel free to fork this project and contribute with it! GitHub repository at: https://github.com/vintasoftware/fixmydjango-lib
 
+Use ``tox`` to run tests.
+
 Authors
 -------
 
