@@ -1,3 +1,6 @@
+import random
+
+
 DEBUG = True
 
 DATABASES = {
@@ -25,4 +28,13 @@ ROOT_URLCONF = 'fixmydjango.tests.urls'
 
 STATIC_URL = '/static/'
 
-FIX_MY_DJANGO_API_BASE_URL = 'http://localhost:8100'
+# Django 1.10 cannot close sockets quick enough while running tox
+# to prevent conflicts we will use a random port
+FIX_MY_DJANGO_API_BASE_URL = 'http://localhost:' + str(random.randint(8100, 8900))
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+    },
+]
