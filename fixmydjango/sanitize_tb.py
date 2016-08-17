@@ -38,8 +38,6 @@ def clean_traceback(tb):
     first_line_index = len(tb_lines) - tb_lines[::-1].index(first_line_should_be) - 1
     tb_lines = tb_lines[first_line_index:]
 
-    first_line = tb_lines[0]
-
     last_line = tb_lines[-1] = tb_lines[-1].lstrip()
     exception_re_match = _exception_re.match(last_line)
     if not exception_re_match:
