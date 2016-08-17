@@ -12,7 +12,7 @@ from termcolor import colored
 
 from .sanitize_tb import (
     is_django_exception, split_and_strip_tb_lines, extract_traceback_info,
-    clean_traceback, sanitize_traceback)
+    clean_traceback, sanitize_traceback, clean_exception_type)
 from .client import search_exceptions
 
 
@@ -60,7 +60,7 @@ class ExceptionReporterPatch(original_ExceptionReporter):
         return '{url}?{query}'.format(
             url='http://www.fixmydjango.com/draft/create/',
             query=urlencode({
-                'exception_type': tb_info['parsed_traceback']['exc_type'],
+                'exception_type': clean_exception_type(tb_info['parsed_traceback']['exc_type']),
                 'error_message': tb_info['parsed_traceback']['exc_msg'],
                 'django_version': '{0[0]}.{0[1]}'.format(django.VERSION),
                 'traceback': sanitized_tb
@@ -82,7 +82,7 @@ class ExceptionReporterPatch(original_ExceptionReporter):
                     sanitized_tb=sanitized_tb)
 
                 response = search_exceptions(
-                    exception_type=tb_info['parsed_traceback']['exc_type'],
+                    exception_type=clean_exception_type(tb_info['parsed_traceback']['exc_type']),
                     raised_by=tb_info['raised_by'],
                     raised_by_line=tb_info['parsed_traceback']['frames'][-1]['lineno'])
 

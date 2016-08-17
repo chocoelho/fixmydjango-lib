@@ -27,14 +27,16 @@ def is_django_exception(tb_lines):
 def clean_traceback(tb):
     tb_lines = split_and_strip_tb_lines(tb)
 
-    # check conditions
-    first_line = tb_lines[0]
     first_line_should_be = 'Traceback (most recent call last):'
-    if first_line != first_line_should_be:
+
+    if first_line_should_be not in tb_lines:
         raise ValueError(
             "Malformed traceback: first line must be "
             "exactly equal to '{}' "
             "(no spaces around)".format(first_line_should_be))
+
+    first_line_index = len(tb_lines) - tb_lines[::-1].index(first_line_should_be) - 1
+    tb_lines = tb_lines[first_line_index:]
 
     last_line = tb_lines[-1] = tb_lines[-1].lstrip()
     exception_re_match = _exception_re.match(last_line)
@@ -114,3 +116,7 @@ def extract_traceback_info(tb):
         'raised_by': last_frame_filepath[last_frame_filepath.index('django/'):],
         'raised_by_line': int(last_frame['lineno'])
     }
+
+
+def clean_exception_type(exception):
+    return exception.split('.')[-1]

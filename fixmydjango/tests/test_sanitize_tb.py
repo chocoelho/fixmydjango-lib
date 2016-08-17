@@ -78,14 +78,6 @@ def test_clean_traceback_check_if_is_django_exception():
     assert 'Invalid traceback: exception not thrown by Django' in str(ex)
 
 
-def test_clean_traceback_first_line():
-    tb = 'garbage garbage blabla\n' + django_tb
-
-    with pytest.raises(ValueError) as ex:
-        clean_traceback(tb)
-    assert 'Malformed traceback: first line' in str(ex)
-
-
 def test_clean_traceback_last_line_with_message():
     tb = django_tb.replace('TemplateDoesNotExist: none.html', '123456')
 
