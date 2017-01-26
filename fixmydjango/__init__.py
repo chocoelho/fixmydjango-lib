@@ -16,7 +16,7 @@ from .sanitize_tb import (
 from .client import search_exceptions
 
 
-__version__ = '0.1'
+__version__ = '0.2'
 
 original_ExceptionReporter = debug.ExceptionReporter
 original_TECHNICAL_500_TEMPLATE = debug.TECHNICAL_500_TEMPLATE
@@ -50,6 +50,13 @@ FIX_MY_DJANGO_MESSAGE_TO_ADMIN_PLAIN = """
 FIX_MY_DJANGO_OOPS_MESSAGE = "oops, Fix My Django got an unexpected exception"
 
 
+base_url = getattr(
+    settings,
+    'FIX_MY_DJANGO_API_BASE_URL',
+    'http://www.fixmydjango.com'
+)
+
+
 class ExceptionReporterPatch(original_ExceptionReporter):
 
     def _get_fix_my_django_admin_url(self, tb_info, sanitized_tb):
@@ -57,8 +64,10 @@ class ExceptionReporterPatch(original_ExceptionReporter):
         Previously the hability to add error traces was limited to admins.
         This is not case anymore as anyone can add it as a draft.
         """
+        err_post_create_path = '/create/'
+        url = '{0}{1}'.format(base_url, err_post_create_path)
         return '{url}?{query}'.format(
-            url='http://www.fixmydjango.com/draft/create/',
+            url=url,
             query=urlencode({
                 'exception_type': clean_exception_type(tb_info['parsed_traceback']['exc_type']),
                 'error_message': tb_info['parsed_traceback']['exc_msg'],
