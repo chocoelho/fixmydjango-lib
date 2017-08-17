@@ -23,29 +23,29 @@ original_TECHNICAL_500_TEMPLATE = debug.TECHNICAL_500_TEMPLATE
 original_technical_500_response = debug.technical_500_response
 
 FIX_MY_DJANGO_MESSAGE = """
-    <h2 style="color: #44B78B;">
-        Fix My Django may have a solution for this exception! Check:
-        <a href="{{ url }}" target="_blank">{{ url }}</a>
-    </h2>
-    {% if is_admin_mode %}
-        <h3 style="color: #FF0000;">
-            You can add this exception as a new error by
-            <a href="{{ admin_url }}" target="_blank">clicking here</a>
-        </h3>
-    {% endif %}
+    <h2 style="color: #44B78B;">FixMyDjango might have a solution for this error!</h2>
+    {% for error in errors %}
+        <h3>Django {{ error.django_version }}</h3>
+        {% for answer in error.answers %}
+            <b>Answer {{ forloop.counter }}</b>
+            <pre>{{ answer.message }}</pre>
+        {% endfor %}
+    {% endfor %}
+
+    <h3 style="display: block;">
+        If none of this works, <a style="margin: 0; padding: 0;" href="{{ admin_url }}">click here</a> to request help.
+        Or <a style="margin: 0; padding: 0;" href="{{ url }}" target="_blank">here</a> to add a missing answer.
+    </h3>
 """
 FIX_MY_DJANGO_MESSAGE_PLAIN = """
     Fix My Django may have a solution for this exception! Check: {url}
 """.strip()
 FIX_MY_DJANGO_MESSAGE_TO_ADMIN = """
-    <h2 style="color: #FF0000;">
-        Hey, Fix My Django doesn't have this error yet! Add it by
-        <a href="{admin_url}" target="_blank">clicking here</a>
-    </h2>
+    <h2 style="color: #FF0000;">We could not find a solution for this error in FixMyDjango</h2>
+    <h3><a href="{admin_url}" target="_blank">Click here</a> request help or just add the error!<h2>
 """
 FIX_MY_DJANGO_MESSAGE_TO_ADMIN_PLAIN = """
-    Hey, Fix My Django doesn't have this error yet! Add it on:
-    {admin_url}
+    Hey, Fix My Django doesn't have this error yet! Add it on: {admin_url}
 """.strip()
 FIX_MY_DJANGO_OOPS_MESSAGE = "oops, Fix My Django got an unexpected exception"
 
@@ -75,6 +75,21 @@ class ExceptionReporterPatch(original_ExceptionReporter):
                 'traceback': sanitized_tb
             }))
 
+    def best_matching_version(self, error_data):
+        errors = error_data.get('error_post_list')
+
+        index = -1
+        for error in errors:
+            index += 1
+            version = error.get('django_version')
+            if version == django.VERSION:
+                break
+
+        e = errors.pop(index)
+        errors.insert(0, e)
+
+        return errors
+
     def get_traceback_data(self):
         c = super(ExceptionReporterPatch, self).get_traceback_data()
         is_admin_mode = getattr(settings, 'FIX_MY_DJANGO_ADMIN_MODE', False)
@@ -101,6 +116,7 @@ class ExceptionReporterPatch(original_ExceptionReporter):
                         Template(FIX_MY_DJANGO_MESSAGE).
                         render(Context({
                             'url': url,
+                            'errors': self.best_matching_version(response),
                             'admin_url': admin_url
                         })))
 
@@ -123,10 +139,12 @@ class ExceptionReporterPatch(original_ExceptionReporter):
 
 def patch_technical_500_template():
     t = original_TECHNICAL_500_TEMPLATE
-    index = t.index('</pre>') + len('</pre>')
-    insertion = '{{ fix_my_django_message|safe }}'
 
-    return t[:index] + insertion + t[index:]
+    insertion = '{{ fix_my_django_message|safe }}'
+    html = t.split('</div>')
+    html.insert(1, insertion)
+
+    return '</div>'.join(html)
 
 
 debug.ExceptionReporter = ExceptionReporterPatch
