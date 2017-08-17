@@ -37,7 +37,7 @@ def test_technical_500_response(settings, mock_api_response, mocker, rf, capsys)
     response = technical_500_response(request, *exc_info)
 
     assert response.status_code == 500
-    assert format_template(FIX_MY_DJANGO_MESSAGE, {'url': test_data_url}) in response.content
+    assert format_template(FIX_MY_DJANGO_MESSAGE[0:50], {'url': test_data_url}) in response.content
 
     out, err = capsys.readouterr()
     assert out == colored(FIX_MY_DJANGO_MESSAGE_PLAIN.format(url=test_data_url), 'yellow') + '\n'
@@ -74,7 +74,7 @@ def test_technical_500_response_admin_mode(settings, mock_api_response, mocker, 
 
     assert response.status_code == 500
     assert format_template(
-        FIX_MY_DJANGO_MESSAGE,
+        FIX_MY_DJANGO_MESSAGE[0:50],
         {'url': test_data_url, 'admin_url': admin_url}
     ) in response.content
 
