@@ -33,7 +33,7 @@ FIX_MY_DJANGO_MESSAGE = """
     {% endfor %}
 
     <h3 style="display: block;">
-        If none of this works, <a style="margin: 0; padding: 0;" href="{{ admin_url }}">click here</a> to request help.
+        If none of this works, <a style="margin: 0; padding: 0;" href="{{ submission_url }}">click here</a> to request help.
         Or <a style="margin: 0; padding: 0;" href="{{ url }}" target="_blank">here</a> to add a missing answer.
     </h3>
 """
@@ -42,10 +42,10 @@ FIX_MY_DJANGO_MESSAGE_PLAIN = """
 """.strip()
 FIX_MY_DJANGO_MESSAGE_TO_ADMIN = """
     <h2 style="color: #FF0000;">We could not find a solution for this error in FixMyDjango</h2>
-    <h3><a href="{admin_url}" target="_blank">Click here</a> request help or just add the error!<h2>
+    <h3><a href="{submission_url}" target="_blank">Click here</a> request help or just add the error!<h2>
 """
 FIX_MY_DJANGO_MESSAGE_TO_ADMIN_PLAIN = """
-    Hey, Fix My Django doesn't have this error yet! Add it on: {admin_url}
+    Hey, Fix My Django doesn't have this error yet! Add it on: {submission_url}
 """.strip()
 FIX_MY_DJANGO_OOPS_MESSAGE = "oops, Fix My Django got an unexpected exception"
 
@@ -59,10 +59,9 @@ base_url = getattr(
 
 class ExceptionReporterPatch(original_ExceptionReporter):
 
-    def _get_fix_my_django_admin_url(self, tb_info, sanitized_tb):
+    def _get_fix_my_django_submission_url(self, tb_info, sanitized_tb):
         """
-        Previously the hability to add error traces was limited to admins.
-        This is not case anymore as anyone can add it as a draft.
+        Links to the error submission url with pre filled fields
         """
         err_post_create_path = '/create/'
         url = '{0}{1}'.format(base_url, err_post_create_path)
@@ -101,7 +100,7 @@ class ExceptionReporterPatch(original_ExceptionReporter):
             if is_django_exception(split_and_strip_tb_lines(tb)):
                 sanitized_tb = sanitize_traceback(clean_traceback(tb))
                 tb_info = extract_traceback_info(sanitized_tb)
-                admin_url = self._get_fix_my_django_admin_url(
+                submission_url = self._get_fix_my_django_submission_url(
                     tb_info=tb_info,
                     sanitized_tb=sanitized_tb)
 
@@ -117,15 +116,15 @@ class ExceptionReporterPatch(original_ExceptionReporter):
                         render(Context({
                             'url': url,
                             'errors': self.best_matching_version(response),
-                            'admin_url': admin_url
+                            'submission_url': submission_url
                         })))
 
                     plain_message = FIX_MY_DJANGO_MESSAGE_PLAIN.format(url=url)
                 else:
                     message = FIX_MY_DJANGO_MESSAGE_TO_ADMIN.format(
-                        admin_url=admin_url)
+                        submission_url=submission_url)
                     plain_message = FIX_MY_DJANGO_MESSAGE_TO_ADMIN_PLAIN.format(
-                        admin_url=admin_url)
+                        submission_url=submission_url)
 
                 c['fix_my_django_message'] = message
                 print(colored(plain_message, 'yellow'))
