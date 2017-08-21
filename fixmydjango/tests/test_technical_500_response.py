@@ -37,7 +37,7 @@ def test_technical_500_response(settings, mock_api_response, mocker, rf, capsys)
     response = technical_500_response(request, *exc_info)
 
     assert response.status_code == 500
-    assert format_template(FIX_MY_DJANGO_MESSAGE, {'url': test_data_url}) in response.content
+    assert format_template(FIX_MY_DJANGO_MESSAGE[0:50], {'url': test_data_url}) in response.content
 
     out, err = capsys.readouterr()
     assert out == colored(FIX_MY_DJANGO_MESSAGE_PLAIN.format(url=test_data_url), 'yellow') + '\n'
@@ -48,7 +48,7 @@ def test_technical_500_response_admin_mode(settings, mock_api_response, mocker, 
     settings.DEBUG = True
     settings.FIX_MY_DJANGO_ADMIN_MODE = True
     test_data_url = 'http://www.fixmydjango.com/test-server'
-    admin_url = 'http://www.fixmydjango.com/test-server/admin'
+    submission_url = 'http://www.fixmydjango.com/test-server/admin'
 
     try:
         raise ValueError("test")
@@ -66,16 +66,16 @@ def test_technical_500_response_admin_mode(settings, mock_api_response, mocker, 
     mocker.patch('fixmydjango.clean_traceback', side_effect=clean_traceback)
     mocker.patch('fixmydjango.sanitize_traceback', side_effect=lambda x: x)
     mocker.patch(
-        'fixmydjango.ExceptionReporterPatch._get_fix_my_django_admin_url',
-        return_value=admin_url)
+        'fixmydjango.ExceptionReporterPatch._get_fix_my_django_submission_url',
+        return_value=submission_url)
 
     request = rf.get(reverse('test-error'))
     response = technical_500_response(request, *exc_info)
 
     assert response.status_code == 500
     assert format_template(
-        FIX_MY_DJANGO_MESSAGE,
-        {'url': test_data_url, 'admin_url': admin_url}
+        FIX_MY_DJANGO_MESSAGE[0:50],
+        {'url': test_data_url, 'submission_url': submission_url}
     ) in response.content
 
     out, err = capsys.readouterr()
@@ -86,7 +86,7 @@ def test_technical_500_response_admin_mode(settings, mock_api_response, mocker, 
 def test_technical_500_response_empty(settings, mock_api_response_empty, mocker, rf, capsys):
     settings.DEBUG = True
     test_data_url = 'http://www.fixmydjango.com/test-server'
-    admin_url = 'http://www.fixmydjango.com/test-server/draft/create/'
+    submission_url = 'http://www.fixmydjango.com/test-server/draft/create/'
 
     try:
         raise ValueError("test")
@@ -104,8 +104,8 @@ def test_technical_500_response_empty(settings, mock_api_response_empty, mocker,
     mocker.patch('fixmydjango.clean_traceback', side_effect=clean_traceback)
     mocker.patch('fixmydjango.sanitize_traceback', side_effect=lambda x: x)
     mocker.patch(
-        'fixmydjango.ExceptionReporterPatch._get_fix_my_django_admin_url',
-        return_value=admin_url)
+        'fixmydjango.ExceptionReporterPatch._get_fix_my_django_submission_url',
+        return_value=submission_url)
 
     request = rf.get(reverse('test-error'))
     response = technical_500_response(request, *exc_info)
@@ -113,14 +113,14 @@ def test_technical_500_response_empty(settings, mock_api_response_empty, mocker,
     assert response.status_code == 500
 
     out, err = capsys.readouterr()
-    assert out == colored(FIX_MY_DJANGO_MESSAGE_TO_ADMIN_PLAIN.format(admin_url=admin_url), 'yellow') + '\n'
+    assert out == colored(FIX_MY_DJANGO_MESSAGE_TO_ADMIN_PLAIN.format(submission_url=submission_url), 'yellow') + '\n'
 
 
 @pytest.mark.usefixtures('settings', 'mock_api_response_empty', 'mocker', 'rf', 'capsys')
 def test_technical_500_response_empty_admin_mode(settings, mock_api_response_empty, mocker, rf, capsys):
     settings.DEBUG = True
     settings.FIX_MY_DJANGO_ADMIN_MODE = True
-    admin_url = 'http://www.fixmydjango.com/test-server/admin'
+    submission_url = 'http://www.fixmydjango.com/test-server/admin'
 
     try:
         raise ValueError("test")
@@ -138,17 +138,17 @@ def test_technical_500_response_empty_admin_mode(settings, mock_api_response_emp
     mocker.patch('fixmydjango.clean_traceback', side_effect=clean_traceback)
     mocker.patch('fixmydjango.sanitize_traceback', side_effect=lambda x: x)
     mocker.patch(
-        'fixmydjango.ExceptionReporterPatch._get_fix_my_django_admin_url',
-        return_value=admin_url)
+        'fixmydjango.ExceptionReporterPatch._get_fix_my_django_submission_url',
+        return_value=submission_url)
 
     request = rf.get(reverse('test-error'))
     response = technical_500_response(request, *exc_info)
 
     assert response.status_code == 500
-    assert FIX_MY_DJANGO_MESSAGE_TO_ADMIN.format(admin_url=admin_url).encode('utf-8') in response.content
+    assert FIX_MY_DJANGO_MESSAGE_TO_ADMIN.format(submission_url=submission_url).encode('utf-8') in response.content
 
     out, err = capsys.readouterr()
-    assert out == colored(FIX_MY_DJANGO_MESSAGE_TO_ADMIN_PLAIN.format(admin_url=admin_url), 'yellow') + '\n'
+    assert out == colored(FIX_MY_DJANGO_MESSAGE_TO_ADMIN_PLAIN.format(submission_url=submission_url), 'yellow') + '\n'
 
 
 @pytest.mark.usefixtures('settings', 'mocker', 'rf', 'capsys')
