@@ -139,7 +139,7 @@ class ExceptionReporterPatch(original_ExceptionReporter):
 def patch_technical_500_template():
     t = original_TECHNICAL_500_TEMPLATE
 
-    insertion = '{{ fix_my_django_message|safe }}'
+    insertion = '<div>{{ fix_my_django_message|safe }}</div>'
     html = t.split('</div>')
     html.insert(1, insertion)
 
