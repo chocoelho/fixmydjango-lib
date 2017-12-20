@@ -17,7 +17,7 @@ author = 'Flávio Juvenal da Silva Junior'
 author_email = 'flavio@vinta.com.br'
 license = 'MIT'
 install_requires = [
-    'Django >= 1.4',
+    'Django >= 1.4, < 2',
     'requests == 2.9.1',
     'boltons == 16.1.1',
     'termcolor == 1.1.0',
