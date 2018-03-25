@@ -3,6 +3,7 @@ from __future__ import print_function, unicode_literals
 import traceback
 
 import django
+from django.http import HttpResponse
 from django.views import debug
 from django.utils.http import urlencode
 from django.conf import settings
@@ -19,7 +20,17 @@ from .client import search_exceptions
 __version__ = '0.3.2'
 
 original_ExceptionReporter = debug.ExceptionReporter
-original_TECHNICAL_500_TEMPLATE = debug.TECHNICAL_500_TEMPLATE
+
+try:
+    from pathlib import Path
+
+    # This is how the template is fetched after 2.0
+    # https://github.com/django/django/blob/stable/2.0.x/django/views/debug.py#L331
+    with Path(debug.CURRENT_DIR, 'templates', 'technical_500.html').open() as fh:
+        original_TECHNICAL_500_TEMPLATE = fh.read()
+except (ImportError, AttributeError): # Django prior to 2.0 will fail
+    original_TECHNICAL_500_TEMPLATE = debug.TECHNICAL_500_TEMPLATE
+
 original_technical_500_response = debug.technical_500_response
 
 FIX_MY_DJANGO_MESSAGE = """
@@ -134,6 +145,15 @@ class ExceptionReporterPatch(original_ExceptionReporter):
             print(colored(FIX_MY_DJANGO_OOPS_MESSAGE, 'red'))
 
         return c
+
+    def get_traceback_html(self):
+        t = super(ExceptionReporterPatch, self).get_traceback_html()
+
+        insertion = Template('<div>{{ fix_my_django_message|safe }}</div>')
+        html = t.split('</div>')
+        html.insert(1, insertion.render(Context(self.get_traceback_data())))
+
+        return '</div>'.join(html)
 
 
 def patch_technical_500_template():
