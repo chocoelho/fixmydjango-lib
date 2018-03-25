@@ -1,3 +1,9 @@
+from socket import gaierror
+try:
+    from urlparse import urlparse
+except ImportError:
+    from urllib.parse import urlparse
+
 import pytest
 import requests
 from distutils.version import LooseVersion
@@ -17,8 +23,13 @@ from django.conf import settings as testsettings
 @pytest.fixture(scope='session')
 def api_live_server(request):
     # for mocking /api/search/ with 'test-api' endpoint of test_urls.py
-    server = live_server_helper.LiveServer(
-        testsettings.FIX_MY_DJANGO_API_BASE_URL.replace('http://', ''))
+    server_addr = urlparse(testsettings.FIX_MY_DJANGO_API_BASE_URL)
+    try:
+        server = live_server_helper.LiveServer(server_addr.hostname)
+    except gaierror:
+        server = live_server_helper.LiveServer(server_addr.hostname, port=server_addr.port)
+    except Exception:
+        server = live_server_helper.LiveServer(server_addr.netloc)
     request.addfinalizer(server.stop)
     return server
 
