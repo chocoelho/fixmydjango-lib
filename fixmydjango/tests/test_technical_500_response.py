@@ -1,6 +1,9 @@
 import sys
 import pytest
-from django.core.urlresolvers import reverse
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
 from django.views.debug import technical_500_response
 from termcolor import colored
 import requests

@@ -3,7 +3,10 @@ import requests
 from distutils.version import LooseVersion
 from pytest_django import live_server_helper
 import django
-from django.core.urlresolvers import reverse
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
 from termcolor import colored
 
 from fixmydjango import FIX_MY_DJANGO_MESSAGE, FIX_MY_DJANGO_MESSAGE_PLAIN
